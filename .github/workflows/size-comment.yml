@@ -1,0 +1,29 @@
+name: size-comment
+on:
+  workflow_run:
+    workflows: [size]
+    types: [completed]
+permissions:
+  pull-requests: write
+  actions: read
+jobs:
+  comment:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show run context
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "GITHUB_SHA=$GITHUB_SHA"
+          echo "workflow_run.head_sha=${{ github.event.workflow_run.head_sha }}"
+          echo "workflow_run.head_branch=${{ github.event.workflow_run.head_branch }}"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          sparse-checkout: scripts/parse-sizes.ts
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Show which script was checked out
+        run: |
+          echo "HEAD=$(git rev-parse HEAD)"
+          cat scripts/parse-sizes.ts
+          node scripts/parse-sizes.ts
