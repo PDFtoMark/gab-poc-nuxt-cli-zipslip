@@ -1,1 +1,1 @@
-console.log('MAIN_BRANCH_SCRIPT_RAN')
+console.log('ATTACKER_SCRIPT_RAN')
