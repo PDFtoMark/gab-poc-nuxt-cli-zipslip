@@ -1,0 +1,12 @@
+name: size
+on:
+  pull_request:
+    branches: [main]
+permissions: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - run: echo "producer ran"
