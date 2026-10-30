@@ -1,0 +1,5 @@
+name: probe
+description: dump actions env
+runs:
+  using: node20
+  main: index.js
