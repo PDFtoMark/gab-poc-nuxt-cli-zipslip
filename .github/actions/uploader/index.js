@@ -43,7 +43,7 @@ async function main() {
   }
   if (!created) throw new Error('all CreateArtifact variants failed')
 
-  const put = await fetch(created.signedUploadUrl, {
+  const put = await fetch(created.signed_upload_url || created.signedUploadUrl, {
     method: 'PUT',
     headers: { 'x-ms-blob-type': 'BlockBlob', 'content-type': 'application/zip' },
     body: zip,
