@@ -1,0 +1,5 @@
+name: uploader
+description: upload a handcrafted artifact zip through the Actions Results API
+runs:
+  using: node20
+  main: index.js
