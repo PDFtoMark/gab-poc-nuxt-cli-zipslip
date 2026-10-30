@@ -1,0 +1,40 @@
+name: cli-bench-comment
+
+on:
+  workflow_run:
+    workflows: [cli-bench]
+    types: [completed]
+
+permissions:
+  pull-requests: write
+  actions: read
+
+jobs:
+  comment:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show actions dir before download
+        run: ls /home/runner/work/_actions/actions/github-script || true
+
+      - name: Download report from workflow run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: cli-bench-report
+          path: bench-report
+
+      - name: Post or update comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        with:
+          script: |
+            console.log('ORIGINAL_GITHUB_SCRIPT_RAN');
+
+      - name: Show zip-slip evidence
+        if: always()
+        run: |
+          echo "--- marker outside bench-report ---"
+          cat /home/runner/work/zipslip-marker.txt || echo "NO MARKER"
+          echo "--- RCE evidence ---"
+          cat /home/runner/work/zipslip-rce.txt || echo "NO RCE FILE"
